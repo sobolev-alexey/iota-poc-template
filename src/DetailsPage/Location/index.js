@@ -67,13 +67,13 @@ class Location extends Component {
 
   // draw lines
   updateLine = data => {
-    if (!this.mapStyle.hasIn(['sources', data.containerId])) {
+    if (!this.mapStyle.hasIn(['sources', data.itemId])) {
       this.mapStyle = this.mapStyle
-        .setIn(['sources', data.containerId], fromJS({ type: 'geojson' }))
-        .set('layers', this.mapStyle.get('layers').push(lineLayer(data.containerId)));
+        .setIn(['sources', data.itemId], fromJS({ type: 'geojson' }))
+        .set('layers', this.mapStyle.get('layers').push(lineLayer(data.itemId)));
 
       this.mapStyle = this.mapStyle.setIn(
-        ['sources', data.containerId, 'data'],
+        ['sources', data.itemId, 'data'],
         fromJS({
           type: 'Feature',
           geometry: {
@@ -84,14 +84,14 @@ class Location extends Component {
       );
     } else {
       this.mapStyle = this.mapStyle.updateIn(
-        ['sources', data.containerId, 'data', 'geometry', 'coordinates'],
+        ['sources', data.itemId, 'data', 'geometry', 'coordinates'],
         list => fromJS(this.toGeoJson())
       );
     }
   };
 
-  renderMarker = (lat, lng, containerId, index) => (
-    <Marker key={containerId + '-' + index} longitude={lng} latitude={lat}>
+  renderMarker = (lat, lng, itemId, index) => (
+    <Marker key={itemId + '-' + index} longitude={lng} latitude={lat}>
       <RoutePin size={Math.round(this.state.viewport.zoom)} />
     </Marker>
   );
@@ -109,8 +109,8 @@ class Location extends Component {
         mapboxApiAccessToken={MAPBOX_TOKEN}
       >
         {!isEmpty(data)
-          ? data.map(({ containerId, position: { lat, lng } }, index) =>
-              this.renderMarker(lat, lng, containerId, index)
+          ? data.map(({ itemId, position: { lat, lng } }, index) =>
+              this.renderMarker(lat, lng, itemId, index)
             )
           : null}
       </MapGL>

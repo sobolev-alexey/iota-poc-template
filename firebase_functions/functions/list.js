@@ -9,7 +9,7 @@ module.exports = function(req, res) {
 
     const ref = admin
       .database()
-      .ref('containers')
+      .ref('items')
       .orderByChild('status');
 
     const promises = [];

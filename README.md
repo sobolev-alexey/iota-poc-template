@@ -1,12 +1,12 @@
-## IOTA Containers Manager DEMO App
+## IOTA Items Tracking DEMO App
 
 https://item-tracking.firebaseapp.com
 
 ## Solution
 
-Centralize digital paperwork and container status management into one system, but store data in an immutable secure decentralized ledger.
+Centralize digital paperwork and item status management into one system, but store data in an immutable secure decentralized ledger.
 
-Provide visibility at all times about container information, inventory, cargo status, shipper, route, all digital documents and certificates, GPS location, refer temperature.
+Provide visibility at all times about item information, inventory, cargo status, shipper, route, all digital documents and certificates, GPS location, refer temperature.
 All information is accessible on any device at any time.
 
 Develop an access and rights management system to control who can have read and write access to which parts of the stored data.
@@ -15,17 +15,17 @@ Ensure documents integrity and authenticity by calculating document checksum on 
 
 #### For shippers:
 
-* simplifies paperwork, enables easy way to provide documents and certificates, even when container is already on the way to the destination
-* enables container position and status monitoring
+* simplifies paperwork, enables easy way to provide documents and certificates, even when item is already on the way to the destination
+* enables item position and status monitoring
 
 #### For customs authorities:
 
-* simplifies access to container inventory/load information and all related documents and certificates
+* simplifies access to item inventory/load information and all related documents and certificates
 * provides access to shipper information and simplifies direct contact if required
 
 #### For port authorities and freight forwarders:
 
-* simplifies access to container route information
+* simplifies access to item route information
 * provides access to temperature sensor information with optional alerting functionality in case of temperature value rise or power outages
 
 ### How it works
@@ -39,12 +39,12 @@ This library exposes functions for creating a new MAM channel, submitting a new 
 
 #### Object identity
 
-Containers are represented by data sets where container ID is a key to retrieve the data.
-Once a new container is announced, an MAM stream is created in the background and initial container information is saved in the first event and becomes immutable.
-Users with specific access rights can append new events to the container MAM stream, such as status or location updates. New documents can be added, its metadata is also appended to the stream as a new event.
+Items are represented by data sets where item ID is a key to retrieve the data.
+Once a new item is announced, an MAM stream is created in the background and initial item information is saved in the first event and becomes immutable.
+Users with specific access rights can append new events to the item MAM stream, such as status or location updates. New documents can be added, its metadata is also appended to the stream as a new event.
 Users with read-only access can retrieve data saved in the stream. Our back-office access management software can determine whether a user is allowed to retrieve all events or just a defined subset of events.
 
-All events saved in the container MAM stream are immutable and encrypted with a strong private key.
+All events saved in the item MAM stream are immutable and encrypted with a strong private key.
 Despite the fact that transactions are stored in a public Tangle, all data is encrypted, and only users who has the stream root address and encryption key can retrieve the saved events and decrypt payload.
 
 #### Document handling
@@ -61,4 +61,4 @@ The document storage is connected to the same system and currently based on Goog
 
 #### Sensor data
 
-Sensor data from temperature sensors and GPS tracker can be feeded into the same channel and use IOTA library in combination with Firebase Cloud functions to append events to existing container streams.
+Sensor data from temperature sensors and GPS tracker can be feeded into the same channel and use IOTA library in combination with Firebase Cloud functions to append events to existing item streams.

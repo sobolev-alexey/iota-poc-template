@@ -1,6 +1,6 @@
 import { handle } from 'redux-pack';
 import { isEmpty } from 'lodash';
-import { ADD_CONTAINER, STORE_CONTAINERS } from '../../actionTypes';
+import { ADD_ITEM, STORE_ITEMS } from '../../actionTypes';
 
 const initialState = {
   data: [],
@@ -11,7 +11,7 @@ export default (state = initialState, action) => {
   const { type, payload } = action;
 
   switch (type) {
-    case STORE_CONTAINERS:
+    case STORE_ITEMS:
       if (isEmpty(payload)) return state;
       return handle(state, action, {
         success: prevState => {
@@ -27,7 +27,7 @@ export default (state = initialState, action) => {
           };
         },
       });
-    case ADD_CONTAINER:
+    case ADD_ITEM:
       if (isEmpty(payload)) return state;
       return handle(state, action, {
         success: prevState => {
@@ -39,7 +39,7 @@ export default (state = initialState, action) => {
         failure: prevState => {
           return {
             data: prevState.data,
-            error: 'Loading containers failed',
+            error: 'Loading items failed',
           };
         },
       });

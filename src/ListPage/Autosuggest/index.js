@@ -25,13 +25,13 @@ class Autosuggest extends Component {
 
     const regex = new RegExp('^' + escapedValue, 'i');
 
-    return this.props.items.filter(container => {
+    return this.props.items.filter(item => {
       return (
-        regex.test(container.shipper) ||
-        regex.test(container.containerId) ||
-        regex.test(container.departure) ||
-        regex.test(container.destination) ||
-        regex.test(container.status)
+        regex.test(item.shipper) ||
+        regex.test(item.itemId) ||
+        regex.test(item.departure) ||
+        regex.test(item.destination) ||
+        regex.test(item.status)
       );
     });
   };
@@ -54,13 +54,13 @@ class Autosuggest extends Component {
 
   getSectionSuggestions = section => [section];
 
-  getSuggestionValue = suggestion => suggestion.containerId;
+  getSuggestionValue = suggestion => suggestion.itemId;
 
   renderSuggestion = suggestion => (
     <DataTable plain>
       <TableBody>
-        <TableRow key={suggestion.containerId}>
-          <TableColumn>{suggestion.containerId}</TableColumn>
+        <TableRow key={suggestion.itemId}>
+          <TableColumn>{suggestion.itemId}</TableColumn>
           <TableColumn className="md-text-center">
             {suggestion.departure} &rarr; {suggestion.destination}
           </TableColumn>
@@ -73,7 +73,7 @@ class Autosuggest extends Component {
   render() {
     const { value, suggestions } = this.state;
     const inputProps = {
-      placeholder: 'Search for containers',
+      placeholder: `Search for ${this.props.trackingUnit}s`,
       value,
       onChange: this.onChange,
     };

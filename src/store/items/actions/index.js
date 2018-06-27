@@ -1,15 +1,15 @@
-import { ADD_CONTAINER, STORE_CONTAINERS } from '../../actionTypes';
+import { ADD_ITEM, STORE_ITEMS } from '../../actionTypes';
 import { getFirebaseSnapshot, getItemsReference } from '../../../utils/firebase';
 
-export const addContainer = containerId => {
-  const promise = getFirebaseSnapshot(containerId, console.log);
+export const addItem = itemId => {
+  const promise = getFirebaseSnapshot(itemId, console.log);
   return {
-    type: ADD_CONTAINER,
+    type: ADD_ITEM,
     promise,
   };
 };
 
-export const storeContainers = user => {
+export const storeItems = user => {
   const promise = new Promise(async (resolve, reject) => {
     try {
       const results = [];
@@ -43,21 +43,21 @@ export const storeContainers = user => {
           });
         })
         .catch(error => {
-          return reject({ error: 'Loading containers failed' });
+          return reject({ error: 'Loading items failed' });
         });
 
       if (results.length > 0) {
         return resolve({ data: results, error: null });
       } else {
-        return reject({ error: 'No containers found' });
+        return reject({ error: 'No items found' });
       }
     } catch (error) {
-      return reject({ error: 'Loading containers failed' });
+      return reject({ error: 'Loading items failed' });
     }
   });
 
   return {
-    type: STORE_CONTAINERS,
+    type: STORE_ITEMS,
     promise,
   };
 };

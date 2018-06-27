@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import { Button, DataTable, TableHeader, TableBody, TableRow, TableColumn } from 'react-md';
 import { isEmpty, upperFirst } from 'lodash';
-import { storeContainers } from '../store/containers/actions';
+import { storeItems } from '../store/items/actions';
 import Loader from '../SharedComponents/Loader';
 import Header from '../SharedComponents/Header';
 import Notification from '../SharedComponents/Notification';
@@ -16,22 +16,22 @@ class ListPage extends Component {
   };
 
   componentDidMount() {
-    const { project, user, history, containers } = this.props;
+    const { project, user, history, items } = this.props;
     if (isEmpty(user) || isEmpty(project)) {
       history.push('/login');
     }
     this.setState({ showLoader: true });
-    this.props.storeContainers(user);
+    this.props.storeItems(user);
     //  else {
-    //   if (isEmpty(containers.data)) {
+    //   if (isEmpty(items.data)) {
     //     this.setState({ showLoader: true });
-    //     this.props.storeContainers(user);
+    //     this.props.storeItems(user);
     //   }
     // }
   }
 
   componentWillReceiveProps(nextProps) {
-    const { containers: { data, error } } = nextProps;
+    const { items: { data, error } } = nextProps;
     if (error) {
       this.notifyError(error);
     }
@@ -43,7 +43,7 @@ class ListPage extends Component {
   notifyError = message => toast.error(message);
 
   render() {
-    const { project, user, history, containers: { data } } = this.props;
+    const { project, user, history, items: { data } } = this.props;
     const { showLoader } = this.state;
 
     return (
@@ -63,7 +63,11 @@ class ListPage extends Component {
         ) : null}
         <Loader showLoader={showLoader} />
         <div className={`md-block-centered ${showLoader ? 'hidden' : ''}`}>
-          <Autosuggest items={data} onSelect={item => history.push(`/details/${item.itemId}`)} />
+          <Autosuggest
+            items={data}
+            onSelect={item => history.push(`/details/${item.itemId}`)}
+            trackingUnit={project.trackingUnit}
+          />
           <DataTable plain>
             <TableHeader>
               <TableRow>
@@ -94,11 +98,11 @@ class ListPage extends Component {
 const mapStateToProps = state => ({
   project: state.project,
   user: state.user,
-  containers: state.containers,
+  items: state.items,
 });
 
 const mapDispatchToProps = dispatch => ({
-  storeContainers: user => dispatch(storeContainers(user)),
+  storeItems: user => dispatch(storeItems(user)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ListPage);

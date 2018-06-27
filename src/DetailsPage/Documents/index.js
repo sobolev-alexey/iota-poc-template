@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { DataTable, TableBody, TableRow, TableColumn, FontIcon } from 'react-md';
 import '../../assets/scss/documents.scss';
 
-class ContainerDocuments extends Component {
+class Documents extends Component {
   getDocumentIcon = doc => {
     switch (doc.contentType) {
       case 'application/pdf':
@@ -21,13 +21,13 @@ class ContainerDocuments extends Component {
   };
 
   render() {
-    const { container } = this.props;
+    const { item } = this.props;
 
     return (
       <div className="documentsWrapper">
         <DataTable plain>
           <TableBody>
-            {container.documents.map(doc => (
+            {item.documents.map(doc => (
               <TableRow key={doc.name}>
                 <TableColumn>
                   <a
@@ -54,4 +54,4 @@ class ContainerDocuments extends Component {
   }
 }
 
-export default ContainerDocuments;
+export default Documents;

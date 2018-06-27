@@ -1,6 +1,6 @@
 @import 'components';
 
-.createContainerWrapper {
+.createItemWrapper {
   max-width: 630px;
   width: 40%;
   margin: 30px auto 0;
@@ -72,13 +72,13 @@
 }
 
 @media (max-width: 900px) {
-  .createContainerWrapper {
+  .createItemWrapper {
     width: 70%;
   }
 }
 
 @media (max-width: 500px) {
-  .createContainerWrapper {
+  .createItemWrapper {
     width: 85%;
   }
 }

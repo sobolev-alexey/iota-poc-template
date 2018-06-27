@@ -3,14 +3,11 @@ import config from '../config.json';
 
 export const initializeFirebaseApp = () => firebase.initializeApp(config);
 
-const getContainerReference = containerId => firebase.database().ref(`containers/${containerId}`);
-
 const getItemReference = itemId => firebase.database().ref(`items/${itemId}`);
 const getUserReference = userId => firebase.database().ref(`users/${userId}`);
 export const getItemsReference = () => firebase.database().ref('items');
 const getSettingsReference = () => firebase.database().ref('settings');
 const getRoleEventMappingReference = role => firebase.database().ref(`roleEventMapping/${role}`);
-export const getFolderReference = () => firebase.database().ref('containers');
 
 export const getFileStorageReference = (pathTofile, fileName) =>
   firebase.storage().ref(`${pathTofile}/${fileName}`);
@@ -57,13 +54,13 @@ export const getEvents = (role, onError) => {
   return promise;
 };
 
-export const getFirebaseSnapshot = (containerId, onError) => {
+export const getFirebaseSnapshot = (itemId, onError) => {
   const promise = new Promise((resolve, reject) => {
     try {
       // Create reference
-      const containersRef = getContainerReference(containerId);
+      const itemsRef = getItemReference(itemId);
 
-      containersRef
+      itemsRef
         .once('value')
         .then(snapshot => {
           resolve(snapshot.val());
@@ -79,21 +76,21 @@ export const getFirebaseSnapshot = (containerId, onError) => {
   return promise;
 };
 
-const appendContainerToUser = (user, containerId) => {
+const appendItemToUser = (user, itemId) => {
   // Get user reference
   const userRef = getUserReference(user.userId);
   const items = user.items || [];
 
   userRef.update({
-    items: [...items, containerId],
+    items: [...items, itemId],
   });
 };
 
-export const createContainer = (eventBody, channel, secretKey) => {
-  // Create container reference
-  const containersRef = getContainerReference(eventBody.containerId);
+export const createItem = (eventBody, channel, secretKey) => {
+  // Create item reference
+  const itemsRef = getItemReference(eventBody.itemId);
 
-  containersRef.set({
+  itemsRef.set({
     ...eventBody,
     mam: {
       root: channel.root,
@@ -105,20 +102,20 @@ export const createContainer = (eventBody, channel, secretKey) => {
   });
 };
 
-export const updateContainer = (eventBody, mam, newContainerData, user) => {
+export const updateItem = (eventBody, mam, newItemData, user) => {
   // Create reference
-  const containersRef = getContainerReference(eventBody.containerId);
+  const itemsRef = getItemReference(eventBody.itemId);
 
-  containersRef.update({
+  itemsRef.update({
     ...eventBody,
     mam: {
       root: mam.root,
       secretKey: mam.secretKey,
-      seed: newContainerData.state.seed,
-      next: newContainerData.state.channel.next_root,
-      start: newContainerData.state.channel.start,
+      seed: newItemData.state.seed,
+      next: newItemData.state.channel.next_root,
+      start: newItemData.state.channel.start,
     },
   });
 
-  appendContainerToUser(user, eventBody.containerId);
+  appendItemToUser(user, eventBody.itemId);
 };

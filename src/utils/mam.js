@@ -1,7 +1,7 @@
 import Mam from 'mam.client.js';
 import IOTA from 'iota.lib.js';
 import { isEmpty, uniqBy, pick, find, last } from 'lodash';
-import { createContainer, updateContainer } from './firebase';
+import { createItem, updateItem } from './firebase';
 import config from '../config.json';
 
 const iota = new IOTA({ provider: config.provider });
@@ -64,29 +64,29 @@ const appendToChannel = async (payload, savedMamData) => {
   }
 };
 
-export const fetchContainer = async (root, secretKey, storeContainerCallback, setStateCalback) => {
-  const containerEvents = [];
+export const fetchItem = async (root, secretKey, storeItemCallback, setStateCalback) => {
+  const itemEvents = [];
   await Mam.fetch(root, 'restricted', secretKey, data => {
-    const containerEvent = JSON.parse(iota.utils.fromTrytes(data));
-    storeContainerCallback(containerEvent);
-    containerEvents.push(containerEvent);
-    setStateCalback(containerEvent, getUniqueStatuses(containerEvents));
+    const itemEvent = JSON.parse(iota.utils.fromTrytes(data));
+    storeItemCallback(itemEvent);
+    itemEvents.push(itemEvent);
+    setStateCalback(itemEvent, getUniqueStatuses(itemEvents));
   }).catch(error => console.log('Cannot fetch stream', error));
 
-  return containerEvents[containerEvents.length - 1];
+  return itemEvents[itemEvents.length - 1];
 };
 
-const getUniqueStatuses = containerEvents =>
-  uniqBy(containerEvents.map(event => pick(event, ['status', 'timestamp'])), 'status');
+const getUniqueStatuses = itemEvents =>
+  uniqBy(itemEvents.map(event => pick(event, ['status', 'timestamp'])), 'status');
 
-export const createContainerChannel = (containerId, request) => {
+export const createItemChannel = (itemId, request) => {
   const promise = new Promise(async (resolve, reject) => {
     try {
       const { departure, destination, load, type, shipper, status } = request;
       const timestamp = Date.now();
       const secretKey = generateSeed(20);
       const eventBody = {
-        containerId,
+        itemId,
         timestamp,
         departure,
         destination,
@@ -105,13 +105,13 @@ export const createContainerChannel = (containerId, request) => {
       const channel = await createNewChannel(messageBody, secretKey);
 
       if (channel && !isEmpty(channel)) {
-        // Create a new container entry using that container ID
-        await createContainer(eventBody, channel, secretKey);
+        // Create a new item entry using that item ID
+        await createItem(eventBody, channel, secretKey);
       }
 
       return resolve(eventBody);
     } catch (error) {
-      console.log('createContainerChannel error', error);
+      console.log('createItemChannel error', error);
       return reject();
     }
   });
@@ -119,17 +119,17 @@ export const createContainerChannel = (containerId, request) => {
   return promise;
 };
 
-export const appendContainerChannel = async (metadata, props, documentExists) => {
+export const appendItemChannel = async (metadata, props, documentExists) => {
   const meta = metadata.length;
-  const { user, container, containers, match: { params: { containerId } } } = props;
-  const { mam } = find(containers, { containerId });
+  const { user, item, items, match: { params: { itemId } } } = props;
+  const { mam } = find(items, { itemId });
 
   const promise = new Promise(async (resolve, reject) => {
     try {
-      if (container) {
+      if (item) {
         const timestamp = Date.now();
         const {
-          containerId,
+          itemId,
           departure,
           destination,
           lastPositionIndex = 0,
@@ -140,7 +140,7 @@ export const appendContainerChannel = async (metadata, props, documentExists) =>
           status,
           temperature,
           documents = [],
-        } = last(container);
+        } = last(item);
         const newStatus = meta
           ? status
           : user.nextEvents[status.toLowerCase().replace(/[- ]/g, '')];
@@ -155,9 +155,9 @@ export const appendContainerChannel = async (metadata, props, documentExists) =>
 
         const newDocuments = [...documents, ...metadata];
 
-        const newContainerData = await appendToChannel(
+        const newItemData = await appendToChannel(
           {
-            containerId,
+            itemId,
             departure,
             destination,
             lastPositionIndex,
@@ -173,9 +173,9 @@ export const appendContainerChannel = async (metadata, props, documentExists) =>
           mam
         );
 
-        if (newContainerData && !isEmpty(newContainerData)) {
+        if (newItemData && !isEmpty(newItemData)) {
           const eventBody = {
-            containerId,
+            itemId,
             timestamp,
             departure,
             destination,
@@ -183,9 +183,9 @@ export const appendContainerChannel = async (metadata, props, documentExists) =>
             status: newStatus,
           };
 
-          await updateContainer(eventBody, mam, newContainerData, user);
+          await updateItem(eventBody, mam, newItemData, user);
 
-          return resolve(containerId);
+          return resolve(itemId);
         }
       }
       return reject();

@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Button } from 'react-md';
 import { isEmpty, find, last, uniqBy, pick } from 'lodash';
 import { toast } from 'react-toastify';
-import { storeContainer } from '../store/container/actions';
+import { storeItem } from '../store/item/actions';
 import Notification from '../SharedComponents/Notification';
 import Loader from '../SharedComponents/Loader';
 import Header from '../SharedComponents/Header';
@@ -11,7 +11,7 @@ import Tabs from './Tabs';
 import Details from './Details';
 import FilesUpload from './Documents/FilesUpload';
 import { validateIntegrity } from './Documents/DocumentIntegrityValidator';
-import { fetchContainer, appendContainerChannel } from '../utils/mam';
+import { fetchItem, appendItemChannel } from '../utils/mam';
 import '../assets/scss/detailsPage.scss';
 
 class DetailsPage extends Component {
@@ -22,26 +22,26 @@ class DetailsPage extends Component {
     fileUploadEnabled: true,
     statusUpdated: false,
     statuses: [],
-    container: null,
+    item: null,
     activeTabIndex: 0,
   };
 
   async componentDidMount() {
-    const { user, container, containers, history, match: { params: { containerId } } } = this.props;
+    const { user, item, items, history, match: { params: { itemId } } } = this.props;
     if (isEmpty(user)) {
       history.push('/login');
     }
-    if (!containerId || isEmpty(containers)) {
+    if (!itemId || isEmpty(items)) {
       history.push('/');
-    } else if (isEmpty(container) || container[0].containerId !== containerId) {
-      this.retrieveContainer(containerId);
+    } else if (isEmpty(item) || item[0].itemId !== itemId) {
+      this.retrieveItem(itemId);
     } else {
-      await validateIntegrity(last(container));
+      await validateIntegrity(last(item));
       this.setState({
         showLoader: false,
         fetchComplete: true,
-        container: last(container),
-        statuses: this.getUniqueStatuses(container),
+        item: last(item),
+        statuses: this.getUniqueStatuses(item),
       });
     }
   }
@@ -50,60 +50,60 @@ class DetailsPage extends Component {
   notifyWarning = message => toast.warn(message);
   notifyError = message => toast.error(message);
 
-  getUniqueStatuses = containerEvents =>
-    uniqBy(containerEvents.map(event => pick(event, ['status', 'timestamp'])), 'status');
+  getUniqueStatuses = itemEvents =>
+    uniqBy(itemEvents.map(event => pick(event, ['status', 'timestamp'])), 'status');
 
   documentExists = documentName => {
     this.setState({ showLoader: false });
     this.notifyError(`Document named ${documentName} already exists`);
   };
 
-  appendToContainer = async () => {
+  appendToItem = async () => {
     const { metadata } = this.state;
     const meta = metadata.length;
     this.setState({ showLoader: true });
-    const response = await appendContainerChannel(metadata, this.props, this.documentExists);
+    const response = await appendItemChannel(metadata, this.props, this.documentExists);
     if (response) {
-      this.notifySuccess(`Container ${meta ? '' : 'status '}updated`);
+      this.notifySuccess(`${this.props.project.trackingUnit} ${meta ? '' : 'status '}updated`);
       this.setState({
         showLoader: false,
         metadata: [],
         fileUploadEnabled: true,
       });
-      this.retrieveContainer(response);
+      this.retrieveItem(response);
     } else {
       this.setState({ showLoader: false });
       this.notifyError('Something went wrong');
     }
   };
 
-  storeContainerCallback = container => {
-    this.props.storeContainer(container);
+  storeItemCallback = item => {
+    this.props.storeItem(item);
   };
 
-  setStateCalback = (container, statuses) => {
-    this.setState({ container, statuses });
+  setStateCalback = (item, statuses) => {
+    this.setState({ item, statuses });
   };
 
-  retrieveContainer = containerId => {
-    const { user, containers } = this.props;
-    const container = find(containers, { containerId });
+  retrieveItem = itemId => {
+    const { user, items, project: { trackingUnit } } = this.props;
+    const item = find(items, { itemId });
     this.setState({ showLoader: true });
     const promise = new Promise(async (resolve, reject) => {
       try {
-        const containerEvent = await fetchContainer(
-          container.mam.root,
-          container.mam.secretKey,
-          this.storeContainerCallback,
+        const itemEvent = await fetchItem(
+          item.mam.root,
+          item.mam.secretKey,
+          this.storeItemCallback,
           this.setStateCalback
         );
 
-        await validateIntegrity(containerEvent);
+        await validateIntegrity(itemEvent);
         this.setState({ showLoader: false, fetchComplete: true });
         return resolve();
       } catch (error) {
         this.setState({ showLoader: false });
-        return reject(this.notifyError('Error loading container data'));
+        return reject(this.notifyError(`Error loading ${trackingUnit} data`));
       }
     });
 
@@ -113,7 +113,7 @@ class DetailsPage extends Component {
   onUploadComplete = metadata => {
     this.setState({ metadata, fileUploadEnabled: false, activeTabIndex: 1 }, () => {
       this.notifySuccess('File upload complete!');
-      this.appendToContainer();
+      this.appendToItem();
     });
   };
 
@@ -123,24 +123,24 @@ class DetailsPage extends Component {
       showLoader,
       statusUpdated,
       statuses,
-      container,
+      item,
       fetchComplete,
       activeTabIndex,
     } = this.state;
-    const { user } = this.props;
+    const { user, project: { trackingUnit } } = this.props;
 
-    if (!container) return <Loader showLoader={showLoader} />;
+    if (!item) return <Loader showLoader={showLoader} />;
 
     const nextStatus =
-      user.canAppendToStream && container
-        ? user.nextEvents[container.status.toLowerCase().replace(/[- ]/g, '')]
+      user.canAppendToStream && item
+        ? user.nextEvents[item.status.toLowerCase().replace(/[- ]/g, '')]
         : '';
 
     return (
       <div>
         <Header>
           <p>
-            Welcome to container tracking,<br />
+            Welcome to {trackingUnit} tracking,<br />
             {user.name || user.role}
           </p>
         </Header>
@@ -151,29 +151,29 @@ class DetailsPage extends Component {
           <div className="md-block-centered">
             <div className="routeCtaWrapper">
               <h1>
-                {container.departure} &rarr; {container.destination}
+                {item.departure} &rarr; {item.destination}
               </h1>
               {user.canAppendToStream && !statusUpdated && nextStatus ? (
-                <Button raised onClick={this.appendToContainer}>
+                <Button raised onClick={this.appendToItem}>
                   Confirm {nextStatus}
                 </Button>
               ) : null}
             </div>
             <Tabs
               activeTabIndex={activeTabIndex}
-              container={container}
+              item={item}
               statuses={statuses}
-              containerEvents={this.props.container}
+              itemEvents={this.props.item}
               fetchComplete={fetchComplete}
             />
-            <Details container={container} />
+            <Details item={item} />
           </div>
         </div>
         {fileUploadEnabled && user.canUploadDocuments ? (
           <FilesUpload
             uploadComplete={this.onUploadComplete}
-            pathTofile={`containers/${container.containerId}`}
-            existingDocuments={container.documents}
+            pathTofile={`items/${item.itemId}`}
+            existingDocuments={item.documents}
           />
         ) : null}
         <Notification />
@@ -184,12 +184,13 @@ class DetailsPage extends Component {
 
 const mapStateToProps = state => ({
   user: state.user,
-  container: state.container,
-  containers: state.containers.data,
+  item: state.item,
+  items: state.items.data,
+  project: state.project,
 });
 
 const mapDispatchToProps = dispatch => ({
-  storeContainer: container => dispatch(storeContainer(container)),
+  storeItem: item => dispatch(storeItem(item)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DetailsPage);
