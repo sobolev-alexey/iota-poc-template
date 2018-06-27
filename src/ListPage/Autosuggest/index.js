@@ -27,7 +27,7 @@ class Autosuggest extends Component {
 
     return this.props.items.filter(item => {
       return (
-        regex.test(item.shipper) ||
+        regex.test(item.owner) ||
         regex.test(item.itemId) ||
         regex.test(item.departure) ||
         regex.test(item.destination) ||

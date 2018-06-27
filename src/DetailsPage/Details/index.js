@@ -8,8 +8,8 @@ const Details = ({ item }) => {
   return (
     <div className="detailSectionWrapper">
       <div className="detailsSection">
-        <span className="label">Shipper</span>
-        <span className="value">{item.shipper}</span>
+        <span className="label">Owner</span>
+        <span className="value">{item.owner}</span>
       </div>
       <div className="detailsSection">
         <span className="label">Item ID</span>

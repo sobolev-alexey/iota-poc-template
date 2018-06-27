@@ -73,7 +73,7 @@ class CreateItemPage extends Component {
         destination: this.destination.value,
         load: this.cargo.value,
         type: this.type.value,
-        shipper: id,
+        owner: id,
         status: previousEvent[0],
       };
       // Format the item ID to remove dashes and parens
@@ -81,7 +81,7 @@ class CreateItemPage extends Component {
       const firebaseSnapshot = await getFirebaseSnapshot(itemId, this.onError);
       if (firebaseSnapshot === null) {
         this.setState({ showLoader: true });
-        const eventBody = await createItemChannel(itemId, request, mam.secret_key);
+        const eventBody = await createItemChannel(itemId, request);
 
         await addItem(itemId);
         await storeItem([eventBody]);

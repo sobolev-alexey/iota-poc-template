@@ -6,14 +6,14 @@ https://item-tracking.firebaseapp.com
 
 Centralize digital paperwork and item status management into one system, but store data in an immutable secure decentralized ledger.
 
-Provide visibility at all times about item information, inventory, cargo status, shipper, route, all digital documents and certificates, GPS location, refer temperature.
+Provide visibility at all times about item information, inventory, cargo status, owner, route, all digital documents and certificates, GPS location, refer temperature.
 All information is accessible on any device at any time.
 
 Develop an access and rights management system to control who can have read and write access to which parts of the stored data.
 
 Ensure documents integrity and authenticity by calculating document checksum on the fly and compare with stored information.
 
-#### For shippers:
+#### For item owners:
 
 * simplifies paperwork, enables easy way to provide documents and certificates, even when item is already on the way to the destination
 * enables item position and status monitoring
@@ -21,7 +21,7 @@ Ensure documents integrity and authenticity by calculating document checksum on 
 #### For customs authorities:
 
 * simplifies access to item inventory/load information and all related documents and certificates
-* provides access to shipper information and simplifies direct contact if required
+* provides access to owner information and simplifies direct contact if required
 
 #### For port authorities and freight forwarders:
 

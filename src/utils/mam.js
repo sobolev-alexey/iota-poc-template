@@ -82,7 +82,7 @@ const getUniqueStatuses = itemEvents =>
 export const createItemChannel = (itemId, request) => {
   const promise = new Promise(async (resolve, reject) => {
     try {
-      const { departure, destination, load, type, shipper, status } = request;
+      const { departure, destination, load, type, owner, status } = request;
       const timestamp = Date.now();
       const secretKey = generateSeed(20);
       const eventBody = {
@@ -90,7 +90,7 @@ export const createItemChannel = (itemId, request) => {
         timestamp,
         departure,
         destination,
-        shipper,
+        owner,
         status,
       };
       const messageBody = {
@@ -135,7 +135,7 @@ export const appendItemChannel = async (metadata, props, documentExists) => {
           lastPositionIndex = 0,
           load,
           position = null,
-          shipper,
+          owner,
           type,
           status,
           temperature,
@@ -163,7 +163,7 @@ export const appendItemChannel = async (metadata, props, documentExists) => {
             lastPositionIndex,
             load,
             position,
-            shipper,
+            owner,
             type,
             timestamp,
             temperature,
@@ -179,7 +179,7 @@ export const appendItemChannel = async (metadata, props, documentExists) => {
             timestamp,
             departure,
             destination,
-            shipper,
+            owner,
             status: newStatus,
           };
 
