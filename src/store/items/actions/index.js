@@ -17,7 +17,7 @@ export const storeItems = user => {
       const ref = getItemsReference();
 
       switch (user.role) {
-        case 'shipper':
+        case 'owner':
           const queryByOwner = ref.orderByChild('owner').equalTo(user.id);
           promises.push(queryByOwner.once('value'));
           break;
