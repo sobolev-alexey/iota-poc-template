@@ -19,15 +19,12 @@ class ListPage extends Component {
     const { project, user, history, items } = this.props;
     if (isEmpty(user) || isEmpty(project)) {
       history.push('/login');
+    } else {
+      if (isEmpty(items.data)) {
+        this.setState({ showLoader: true });
+        this.props.storeItems(user);
+      }
     }
-    this.setState({ showLoader: true });
-    this.props.storeItems(user);
-    //  else {
-    //   if (isEmpty(items.data)) {
-    //     this.setState({ showLoader: true });
-    //     this.props.storeItems(user);
-    //   }
-    // }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -45,6 +42,8 @@ class ListPage extends Component {
   render() {
     const { project, user, history, items: { data } } = this.props;
     const { showLoader } = this.state;
+
+    if (!project || !project.listPage) return <div />;
 
     return (
       <div className="App">
