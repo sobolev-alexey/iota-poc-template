@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import { Button, DataTable, TableHeader, TableBody, TableRow, TableColumn } from 'react-md';
-import { isEmpty, upperFirst } from 'lodash';
+import { isEmpty } from 'lodash';
 import { storeItems } from '../store/items/actions';
 import Loader from '../SharedComponents/Loader';
 import Header from '../SharedComponents/Header';
@@ -70,19 +70,31 @@ class ListPage extends Component {
           <DataTable plain>
             <TableHeader>
               <TableRow>
-                <TableColumn>{upperFirst(project.trackingUnit)} ID</TableColumn>
-                <TableColumn className="md-text-center">Route</TableColumn>
-                <TableColumn className="md-text-right">Status</TableColumn>
+                {project.listPage.headers.map((header, index) => (
+                  <TableColumn
+                    key={header}
+                    className={index === 1 ? 'md-text-center' : index === 2 ? 'md-text-right' : ''}
+                  >
+                    {header}
+                  </TableColumn>
+                ))}
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.map(({ itemId, departure, destination, status }) => (
-                <TableRow key={itemId} onClick={() => history.push(`/details/${itemId}`)}>
-                  <TableColumn>{itemId}</TableColumn>
-                  <TableColumn className="md-text-center">
-                    {departure} &rarr; {destination}
-                  </TableColumn>
-                  <TableColumn className="md-text-right">{status}</TableColumn>
+              {data.map(item => (
+                <TableRow key={item.itemId} onClick={() => history.push(`/details/${item.itemId}`)}>
+                  {project.listPage.body.map((entry, index) => (
+                    <TableColumn
+                      key={`${item.itemId}-${index}`}
+                      className={
+                        index === 1 ? 'md-text-center' : index === 2 ? 'md-text-right' : ''
+                      }
+                    >
+                      {typeof entry === 'string'
+                        ? item[entry]
+                        : entry.map(field => item[field]).join(' → ')}
+                    </TableColumn>
+                  ))}
                 </TableRow>
               ))}
             </TableBody>
