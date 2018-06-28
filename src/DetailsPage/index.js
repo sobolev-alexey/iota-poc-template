@@ -86,7 +86,7 @@ class DetailsPage extends Component {
   };
 
   retrieveItem = itemId => {
-    const { user, items, project: { trackingUnit } } = this.props;
+    const { items, project: { trackingUnit } } = this.props;
     const item = find(items, { itemId });
     this.setState({ showLoader: true });
     const promise = new Promise(async (resolve, reject) => {

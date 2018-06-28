@@ -67,7 +67,7 @@ class CreateItemPage extends Component {
     const { history, storeItem, addItem, user, project: { trackingUnit } } = this.props;
 
     if (!formError) {
-      const { id, previousEvent, mam } = user;
+      const { id, previousEvent } = user;
       const request = {
         departure: this.departure.value,
         destination: this.destination.value,
