@@ -127,7 +127,10 @@ class DetailsPage extends Component {
       fetchComplete,
       activeTabIndex,
     } = this.state;
-    const { user, project: { trackingUnit } } = this.props;
+    const {
+      user,
+      project: { trackingUnit, documentStorage, locationTracking, temperatureChart },
+    } = this.props;
 
     if (!item) return <Loader showLoader={showLoader} />;
 
@@ -165,6 +168,9 @@ class DetailsPage extends Component {
               statuses={statuses}
               itemEvents={this.props.item}
               fetchComplete={fetchComplete}
+              locationTracking={locationTracking}
+              documentStorage={documentStorage}
+              temperatureChart={temperatureChart}
             />
             <Details item={item} />
           </div>

@@ -26,7 +26,16 @@ class ItemTabs extends PureComponent {
   };
 
   render() {
-    const { item, statuses, itemEvents, size, fetchComplete } = this.props;
+    const {
+      item,
+      statuses,
+      itemEvents,
+      size,
+      fetchComplete,
+      locationTracking,
+      documentStorage,
+      temperatureChart,
+    } = this.props;
     const locations = itemEvents.filter(({ position }) => !isEmpty(position));
 
     return (
@@ -39,17 +48,21 @@ class ItemTabs extends PureComponent {
           <Tab label="Status">
             <StatusList statuses={statuses} />
           </Tab>
-          {item.documents && item.documents.length > 0 ? (
+          {documentStorage && item.documents && item.documents.length > 0 ? (
             <Tab label="Documents">
               <Documents item={item} />
             </Tab>
           ) : null}
-          {itemEvents && last(itemEvents) && last(itemEvents).temperature ? (
+          {temperatureChart && itemEvents && last(itemEvents) && last(itemEvents).temperature ? (
             <Tab label="Temperature">
               <Temperature data={itemEvents} />
             </Tab>
           ) : null}
-          {fetchComplete && itemEvents && last(itemEvents) && locations.length > 0 ? (
+          {locationTracking &&
+          fetchComplete &&
+          itemEvents &&
+          last(itemEvents) &&
+          locations.length > 0 ? (
             <Tab label="Location">
               <Location data={locations} />
             </Tab>
