@@ -178,7 +178,7 @@ class DetailsPage extends Component {
         {fileUploadEnabled && user.canUploadDocuments ? (
           <FilesUpload
             uploadComplete={this.onUploadComplete}
-            pathTofile={`items/${item.itemId}`}
+            pathTofile={`${trackingUnit.replace(/\s/g, '')}/${item.itemId}`}
             existingDocuments={item.documents}
           />
         ) : null}
