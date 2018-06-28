@@ -129,7 +129,7 @@ class DetailsPage extends Component {
     } = this.state;
     const {
       user,
-      project: { trackingUnit, documentStorage, locationTracking, temperatureChart },
+      project: { trackingUnit, documentStorage, locationTracking, temperatureChart, detailsPage },
     } = this.props;
 
     if (!item) return <Loader showLoader={showLoader} />;
@@ -172,10 +172,10 @@ class DetailsPage extends Component {
               documentStorage={documentStorage}
               temperatureChart={temperatureChart}
             />
-            <Details item={item} />
+            <Details item={item} fields={detailsPage} />
           </div>
         </div>
-        {fileUploadEnabled && user.canUploadDocuments ? (
+        {documentStorage && fileUploadEnabled && user.canUploadDocuments ? (
           <FilesUpload
             uploadComplete={this.onUploadComplete}
             pathTofile={`${trackingUnit.replace(/\s/g, '')}/${item.itemId}`}
