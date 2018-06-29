@@ -20,7 +20,7 @@ class ListPage extends Component {
     if (isEmpty(user) || isEmpty(project)) {
       history.push('/login');
     } else {
-      if (isEmpty(items.data)) {
+      if (isEmpty(items.data) && user.previousEvent) {
         this.setState({ showLoader: true });
         this.props.storeItems(user);
       }
@@ -32,7 +32,11 @@ class ListPage extends Component {
     if (error) {
       this.notifyError(error);
     }
-    if (!isEmpty(data)) {
+    if (isEmpty(this.props.items.data) && nextProps.user.previousEvent) {
+      this.setState({ showLoader: true });
+      this.props.storeItems(nextProps.user);
+    }
+    if (!isEmpty(data) || !isEmpty(this.props.items.data)) {
       this.setState({ showLoader: false });
     }
   }
