@@ -9,7 +9,7 @@ import Header from '../SharedComponents/Header';
 import Notification from '../SharedComponents/Notification';
 import { addItem } from '../store/items/actions';
 import { storeItem } from '../store/item/actions';
-import { getFirebaseSnapshot } from '../utils/firebase';
+import { getFirebaseSnapshot, reassignOwnership } from '../utils/firebase';
 import { createItemChannel } from '../utils/mam';
 import '../assets/scss/createItemPage.scss';
 
@@ -64,7 +64,7 @@ class CreateItemPage extends Component {
   createItem = async event => {
     event.preventDefault();
     const formError = this.validate();
-    const { history, storeItem, addItem, user, project: { trackingUnit } } = this.props;
+    const { history, storeItem, addItem, user, project } = this.props;
 
     if (!formError) {
       const { id, previousEvent } = user;
@@ -85,10 +85,11 @@ class CreateItemPage extends Component {
 
         await addItem(itemId);
         await storeItem([eventBody]);
+        reassignOwnership(project, user, { itemId, status: previousEvent[0] }, false);
 
         history.push(`/details/${itemId}`);
       } else {
-        this.notifyError(`${upperFirst(trackingUnit)} exists`);
+        this.notifyError(`${upperFirst(project.trackingUnit)} exists`);
       }
     } else {
       this.notifyError('Error with some of the input fields');

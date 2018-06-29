@@ -6,7 +6,7 @@ import { TextField, SelectField, Button, FontIcon } from 'react-md';
 import { toast } from 'react-toastify';
 import { isEmpty, upperFirst } from 'lodash';
 import { storeCredentials, storeEvents } from '../store/user/actions';
-import { storeProjectSettings } from '../store/project/actions';
+import { storeProjectSettings, storeEventMappings } from '../store/project/actions';
 import Logo from '../SharedComponents/Logo';
 import Loader from '../SharedComponents/Loader';
 import Notification from '../SharedComponents/Notification';
@@ -20,6 +20,7 @@ class LoginPage extends Component {
 
   componentDidMount() {
     this.props.loadProjectSettings();
+    this.props.loadEventMappings();
   }
 
   login = event => {
@@ -106,6 +107,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   loadProjectSettings: () => dispatch(storeProjectSettings()),
+  loadEventMappings: () => dispatch(storeEventMappings()),
   storeCredentials: credentials => dispatch(storeCredentials(credentials)),
   storeEvents: role => dispatch(storeEvents(role)),
 });

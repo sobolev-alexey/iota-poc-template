@@ -12,6 +12,7 @@ import Details from './Details';
 import FilesUpload from './Documents/FilesUpload';
 import { validateIntegrity } from './Documents/DocumentIntegrityValidator';
 import { fetchItem, appendItemChannel } from '../utils/mam';
+import { reassignOwnership } from '../utils/firebase';
 import '../assets/scss/detailsPage.scss';
 
 class DetailsPage extends Component {
@@ -59,7 +60,8 @@ class DetailsPage extends Component {
   };
 
   appendToItem = async () => {
-    const { metadata } = this.state;
+    const { user, project } = this.props;
+    const { metadata, item } = this.state;
     const meta = metadata.length;
     this.setState({ showLoader: true });
     const response = await appendItemChannel(metadata, this.props, this.documentExists);
@@ -71,6 +73,7 @@ class DetailsPage extends Component {
         fileUploadEnabled: true,
       });
       this.retrieveItem(response);
+      reassignOwnership(project, user, item);
     } else {
       this.setState({ showLoader: false });
       this.notifyError('Something went wrong');

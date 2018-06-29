@@ -1,12 +1,13 @@
 import firebase from 'firebase';
+import { getNextUsers } from './common';
 import config from '../config.json';
 
 export const initializeFirebaseApp = () => firebase.initializeApp(config);
-
+export const getItemsReference = () => firebase.database().ref('items');
 const getItemReference = itemId => firebase.database().ref(`items/${itemId}`);
 const getUserReference = userId => firebase.database().ref(`users/${userId}`);
-export const getItemsReference = () => firebase.database().ref('items');
 const getSettingsReference = () => firebase.database().ref('settings');
+const getEventMappingReference = () => firebase.database().ref('roleEventMapping');
 const getRoleEventMappingReference = role => firebase.database().ref(`roleEventMapping/${role}`);
 
 export const getFileStorageReference = (pathTofile, fileName) =>
@@ -76,14 +77,50 @@ export const getFirebaseSnapshot = (itemId, onError) => {
   return promise;
 };
 
-const appendItemToUser = (user, itemId) => {
+const appendItemToNewUser = (userId, itemId) => {
+  try {
+    // Get user reference
+    const userRef = getUserReference(userId);
+
+    userRef
+      .once('value')
+      .then(snapshot => {
+        const user = snapshot.val();
+        const items = user.items || [];
+
+        userRef.update({
+          items: [...items, itemId],
+        });
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const removeItemFromCurrentUser = (user, itemId) => {
   // Get user reference
   const userRef = getUserReference(user.userId);
   const items = user.items || [];
+  const index = items.indexOf(itemId);
+  if (index > -1) {
+    items.splice(index, 1);
+  }
 
   userRef.update({
-    items: [...items, itemId],
+    items: [...items],
   });
+};
+
+export const reassignOwnership = (project, user, item, removeFromCurrentOwner = true) => {
+  if (removeFromCurrentOwner) {
+    // for create item set flag to "false"
+    removeItemFromCurrentUser(user, item.itemId);
+  }
+  const newUsers = getNextUsers(project, user, item);
+  newUsers.map(newUser => appendItemToNewUser(newUser, item.itemId))
 };
 
 export const createItem = (eventBody, channel, secretKey) => {
@@ -116,6 +153,25 @@ export const updateItem = (eventBody, mam, newItemData, user) => {
       start: newItemData.state.channel.start,
     },
   });
+};
 
-  appendItemToUser(user, eventBody.itemId);
+export const getEventMappings = onError => {
+  const promise = new Promise((resolve, reject) => {
+    try {
+      const eventsRef = getEventMappingReference();
+
+      eventsRef
+        .once('value')
+        .then(snapshot => {
+          resolve(snapshot.val());
+        })
+        .catch(error => {
+          reject(onError(error));
+        });
+    } catch (error) {
+      reject(onError(error));
+    }
+  });
+
+  return promise;
 };
