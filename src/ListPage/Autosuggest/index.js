@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Autosuggester from 'react-autosuggest';
+import { remove } from 'lodash';
 import { DataTable, TableBody, TableRow, TableColumn } from 'react-md';
 import '../../assets/scss/autosuggest.scss';
 
@@ -24,15 +25,12 @@ class Autosuggest extends Component {
     }
 
     const regex = new RegExp('^' + escapedValue, 'i');
+    const fields = this.props.project.firebaseFields;
+    remove(fields, field => field === 'timestamp')
 
     return this.props.items.filter(item => {
-      return (
-        regex.test(item.owner) ||
-        regex.test(item.itemId) ||
-        regex.test(item.departure) ||
-        regex.test(item.destination) ||
-        regex.test(item.status)
-      );
+      const result = fields.find(field => regex.test(item[field]))
+      return !!result
     });
   };
 
@@ -60,11 +58,18 @@ class Autosuggest extends Component {
     <DataTable plain>
       <TableBody>
         <TableRow key={suggestion.itemId}>
-          <TableColumn>{suggestion.itemId}</TableColumn>
-          <TableColumn className="md-text-center">
-            {suggestion.departure} &rarr; {suggestion.destination}
-          </TableColumn>
-          <TableColumn className="md-text-right">{suggestion.status}</TableColumn>
+          {this.props.project.listPage.body.map((entry, index) => (
+            <TableColumn
+              key={`${suggestion.itemId}-${index}`}
+              className={
+                index === 1 ? 'md-text-center' : index === 2 ? 'md-text-right' : ''
+              }
+            >
+              {typeof entry === 'string'
+                ? suggestion[entry]
+                : entry.map(field => suggestion[field]).join(' → ')}
+            </TableColumn>
+          ))}
         </TableRow>
       </TableBody>
     </DataTable>

@@ -79,28 +79,23 @@ export const fetchItem = async (root, secretKey, storeItemCallback, setStateCalb
 const getUniqueStatuses = itemEvents =>
   uniqBy(itemEvents.map(event => pick(event, ['status', 'timestamp'])), 'status');
 
-export const createItemChannel = (itemId, request) => {
+export const createItemChannel = (project, itemId, request) => {
   const promise = new Promise(async (resolve, reject) => {
     try {
-      const { departure, destination, load, type, owner, status } = request;
-      const timestamp = Date.now();
       const secretKey = generateSeed(20);
-      const eventBody = {
-        itemId,
-        timestamp,
-        departure,
-        destination,
-        owner,
-        status,
-      };
+      const eventBody = {}
+      project.firebaseFields.forEach(field => eventBody[field] = request[field]);
+      eventBody.itemId = itemId;
+      eventBody.timestamp = Date.now();
+
       const messageBody = {
+        ...request,
         ...eventBody,
-        load,
-        type,
-        temperature: null,
-        position: null,
-        documents: [],
-      };
+          temperature: null,
+          position: null,
+          lastPositionIndex: 0,
+          documents: [],
+      }
 
       const channel = await createNewChannel(messageBody, secretKey);
 
@@ -121,26 +116,14 @@ export const createItemChannel = (itemId, request) => {
 
 export const appendItemChannel = async (metadata, props, documentExists) => {
   const meta = metadata.length;
-  const { user, item, items, match: { params: { itemId } } } = props;
+  const { project, user, item, items, match: { params: { itemId } } } = props;
   const { mam } = find(items, { itemId });
+  const { status, documents } = last(item);
 
   const promise = new Promise(async (resolve, reject) => {
     try {
       if (item) {
         const timestamp = Date.now();
-        const {
-          itemId,
-          departure,
-          destination,
-          lastPositionIndex = 0,
-          load,
-          position = null,
-          owner,
-          type,
-          status,
-          temperature,
-          documents = [],
-        } = last(item);
         const newStatus = meta
           ? status
           : user.nextEvents[status.toLowerCase().replace(/[- ]/g, '')];
@@ -153,35 +136,22 @@ export const appendItemChannel = async (metadata, props, documentExists) => {
           });
         });
 
-        const newDocuments = [...documents, ...metadata];
+        const payload = {}
+        project.fields.forEach(field => payload[field] = last(item)[field])
+        const newPayload = {
+          ...payload,
+          timestamp,
+          status: newStatus,
+          documents: [...documents, ...metadata],
+        }
 
-        const newItemData = await appendToChannel(
-          {
-            itemId,
-            departure,
-            destination,
-            lastPositionIndex,
-            load,
-            position,
-            owner,
-            type,
-            timestamp,
-            temperature,
-            status: newStatus,
-            documents: newDocuments,
-          },
-          mam
-        );
+        const newItemData = await appendToChannel(newPayload, mam);
 
         if (newItemData && !isEmpty(newItemData)) {
-          const eventBody = {
-            itemId,
-            timestamp,
-            departure,
-            destination,
-            owner,
-            status: newStatus,
-          };
+          const eventBody = {}
+          project.firebaseFields.forEach(field => eventBody[field] = last(item)[field]);
+          eventBody.status = newStatus;
+          eventBody.timestamp = timestamp;
 
           await updateItem(eventBody, mam, newItemData, user);
 

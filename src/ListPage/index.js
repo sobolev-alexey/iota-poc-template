@@ -68,6 +68,7 @@ class ListPage extends Component {
         <div className={`md-block-centered ${showLoader ? 'hidden' : ''}`}>
           <Autosuggest
             items={data}
+            project={project}
             onSelect={item => history.push(`/details/${item.itemId}`)}
             trackingUnit={project.trackingUnit}
           />

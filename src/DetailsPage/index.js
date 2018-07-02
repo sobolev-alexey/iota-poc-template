@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Button } from 'react-md';
-import { isEmpty, find, last, uniqBy, pick } from 'lodash';
+import { isEmpty, find, last, uniqBy, pick, upperFirst } from 'lodash';
 import { toast } from 'react-toastify';
 import { storeItem } from '../store/item/actions';
 import Notification from '../SharedComponents/Notification';
@@ -66,7 +66,7 @@ class DetailsPage extends Component {
     this.setState({ showLoader: true });
     const response = await appendItemChannel(metadata, this.props, this.documentExists);
     if (response) {
-      this.notifySuccess(`${this.props.project.trackingUnit} ${meta ? '' : 'status '}updated`);
+      this.notifySuccess(`${upperFirst(project.trackingUnit)} ${meta ? '' : 'status '}updated`);
       this.setState({
         showLoader: false,
         metadata: [],
@@ -157,7 +157,11 @@ class DetailsPage extends Component {
           <div className="md-block-centered">
             <div className="routeCtaWrapper">
               <h1>
-                {item.departure} &rarr; {item.destination}
+                {
+                  typeof detailsPage.title === 'string'
+                    ? item[detailsPage.title]
+                    : detailsPage.title.map(field => item[field]).join(' → ')
+                }
               </h1>
               {user.canAppendToStream && !statusUpdated && nextStatus ? (
                 <Button raised onClick={this.appendToItem}>
