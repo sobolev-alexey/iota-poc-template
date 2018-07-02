@@ -28,7 +28,15 @@ class DetailsPage extends Component {
   };
 
   async componentDidMount() {
-    const { user, item, items, history, match: { params: { itemId } } } = this.props;
+    const {
+      user,
+      item,
+      items,
+      history,
+      match: {
+        params: { itemId },
+      },
+    } = this.props;
     if (isEmpty(user)) {
       history.push('/login');
     }
@@ -89,7 +97,10 @@ class DetailsPage extends Component {
   };
 
   retrieveItem = itemId => {
-    const { items, project: { trackingUnit } } = this.props;
+    const {
+      items,
+      project: { trackingUnit },
+    } = this.props;
     const item = find(items, { itemId });
     this.setState({ showLoader: true });
     const promise = new Promise(async (resolve, reject) => {
@@ -157,11 +168,9 @@ class DetailsPage extends Component {
           <div className="md-block-centered">
             <div className="routeCtaWrapper">
               <h1>
-                {
-                  typeof detailsPage.title === 'string'
-                    ? item[detailsPage.title]
-                    : detailsPage.title.map(field => item[field]).join(' → ')
-                }
+                {typeof detailsPage.title === 'string'
+                  ? item[detailsPage.title]
+                  : detailsPage.title.map(field => item[field]).join(' → ')}
               </h1>
               {user.canAppendToStream && !statusUpdated && nextStatus ? (
                 <Button raised onClick={this.appendToItem}>
@@ -206,4 +215,7 @@ const mapDispatchToProps = dispatch => ({
   storeItem: item => dispatch(storeItem(item)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(DetailsPage);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(DetailsPage);

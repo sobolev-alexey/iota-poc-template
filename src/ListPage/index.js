@@ -28,7 +28,9 @@ class ListPage extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { items: { data, error } } = nextProps;
+    const {
+      items: { data, error },
+    } = nextProps;
     if (error) {
       this.notifyError(error);
     }
@@ -44,7 +46,12 @@ class ListPage extends Component {
   notifyError = message => toast.error(message);
 
   render() {
-    const { project, user, history, items: { data } } = this.props;
+    const {
+      project,
+      user,
+      history,
+      items: { data },
+    } = this.props;
     const { showLoader } = this.state;
 
     if (!project || !project.listPage) return <div />;
@@ -121,4 +128,7 @@ const mapDispatchToProps = dispatch => ({
   storeItems: user => dispatch(storeItems(user)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ListPage);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ListPage);

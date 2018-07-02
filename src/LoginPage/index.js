@@ -50,7 +50,9 @@ class LoginPage extends Component {
 
   render() {
     const { showLoader } = this.state;
-    const { project: { roleUserMapping, projectName } } = this.props;
+    const {
+      project: { roleUserMapping, projectName },
+    } = this.props;
     if (isEmpty(roleUserMapping)) {
       return <div />;
     }
@@ -112,4 +114,7 @@ const mapDispatchToProps = dispatch => ({
   storeEvents: role => dispatch(storeEvents(role)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(LoginPage);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(LoginPage);

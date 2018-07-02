@@ -29,7 +29,10 @@ class Temperature extends Component {
   };
 
   render() {
-    const { data, size: { width } } = this.props;
+    const {
+      data,
+      size: { width },
+    } = this.props;
     const filteredData = data.filter(({ temperature }) => temperature);
     const temperature = this.getTemperatureData(filteredData);
     const xRange = this.getXRange(filteredData);

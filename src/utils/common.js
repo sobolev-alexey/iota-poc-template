@@ -1,5 +1,5 @@
 export const getNextUsers = (project, user, item) => {
-  const nextStatus = user.nextEvents[item.status.toLowerCase().replace(/[- ]/g, '')]
+  const nextStatus = user.nextEvents[item.status.toLowerCase().replace(/[- ]/g, '')];
   const nextUserRoles = [];
   Object.keys(project.events).forEach(role => {
     if (project.events[role] && project.events[role].previousEvent) {
@@ -10,6 +10,6 @@ export const getNextUsers = (project, user, item) => {
       });
     }
   });
-  const newUsers = nextUserRoles.map(role => project.roleUserMapping[role])
+  const newUsers = nextUserRoles.map(role => project.roleUserMapping[role]);
   return newUsers;
 };

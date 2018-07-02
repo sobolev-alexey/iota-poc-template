@@ -105,7 +105,10 @@ class CreateItemPage extends Component {
       cargoError,
       typeError,
     } = this.state;
-    const { history, project: { trackingUnit } } = this.props;
+    const {
+      history,
+      project: { trackingUnit },
+    } = this.props;
 
     const unit = upperFirst(trackingUnit);
 
@@ -208,4 +211,7 @@ const mapDispatchToProps = dispatch => ({
   storeItem: item => dispatch(storeItem(item)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(CreateItemPage));
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(CreateItemPage));

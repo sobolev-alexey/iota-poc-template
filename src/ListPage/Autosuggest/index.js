@@ -26,11 +26,11 @@ class Autosuggest extends Component {
 
     const regex = new RegExp('^' + escapedValue, 'i');
     const fields = this.props.project.firebaseFields;
-    remove(fields, field => field === 'timestamp')
+    remove(fields, field => field === 'timestamp');
 
     return this.props.items.filter(item => {
-      const result = fields.find(field => regex.test(item[field]))
-      return !!result
+      const result = fields.find(field => regex.test(item[field]));
+      return !!result;
     });
   };
 
@@ -61,9 +61,7 @@ class Autosuggest extends Component {
           {this.props.project.listPage.body.map((entry, index) => (
             <TableColumn
               key={`${suggestion.itemId}-${index}`}
-              className={
-                index === 1 ? 'md-text-center' : index === 2 ? 'md-text-right' : ''
-              }
+              className={index === 1 ? 'md-text-center' : index === 2 ? 'md-text-right' : ''}
             >
               {typeof entry === 'string'
                 ? suggestion[entry]

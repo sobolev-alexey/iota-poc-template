@@ -83,19 +83,19 @@ export const createItemChannel = (project, itemId, request) => {
   const promise = new Promise(async (resolve, reject) => {
     try {
       const secretKey = generateSeed(20);
-      const eventBody = {}
-      project.firebaseFields.forEach(field => eventBody[field] = request[field]);
+      const eventBody = {};
+      project.firebaseFields.forEach(field => (eventBody[field] = request[field]));
       eventBody.itemId = itemId;
       eventBody.timestamp = Date.now();
 
       const messageBody = {
         ...request,
         ...eventBody,
-          temperature: null,
-          position: null,
-          lastPositionIndex: 0,
-          documents: [],
-      }
+        temperature: null,
+        position: null,
+        lastPositionIndex: 0,
+        documents: [],
+      };
 
       const channel = await createNewChannel(messageBody, secretKey);
 
@@ -116,7 +116,15 @@ export const createItemChannel = (project, itemId, request) => {
 
 export const appendItemChannel = async (metadata, props, documentExists) => {
   const meta = metadata.length;
-  const { project, user, item, items, match: { params: { itemId } } } = props;
+  const {
+    project,
+    user,
+    item,
+    items,
+    match: {
+      params: { itemId },
+    },
+  } = props;
   const { mam } = find(items, { itemId });
   const { status, documents } = last(item);
 
@@ -136,20 +144,20 @@ export const appendItemChannel = async (metadata, props, documentExists) => {
           });
         });
 
-        const payload = {}
-        project.fields.forEach(field => payload[field] = last(item)[field])
+        const payload = {};
+        project.fields.forEach(field => (payload[field] = last(item)[field]));
         const newPayload = {
           ...payload,
           timestamp,
           status: newStatus,
           documents: [...documents, ...metadata],
-        }
+        };
 
         const newItemData = await appendToChannel(newPayload, mam);
 
         if (newItemData && !isEmpty(newItemData)) {
-          const eventBody = {}
-          project.firebaseFields.forEach(field => eventBody[field] = last(item)[field]);
+          const eventBody = {};
+          project.firebaseFields.forEach(field => (eventBody[field] = last(item)[field]));
           eventBody.status = newStatus;
           eventBody.timestamp = timestamp;
 

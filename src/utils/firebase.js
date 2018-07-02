@@ -120,7 +120,7 @@ export const reassignOwnership = (project, user, item, removeFromCurrentOwner = 
     removeItemFromCurrentUser(user, item.itemId);
   }
   const newUsers = getNextUsers(project, user, item);
-  newUsers.map(newUser => appendItemToNewUser(newUser, item.itemId))
+  newUsers.map(newUser => appendItemToNewUser(newUser, item.itemId));
 };
 
 export const createItem = (eventBody, channel, secretKey) => {
