@@ -15,6 +15,26 @@ import { fetchItem, appendItemChannel } from '../utils/mam';
 import { reassignOwnership } from '../utils/firebase';
 import '../assets/scss/detailsPage.scss';
 
+const StatusButtons = ({ statuses, onClick }) => {
+  if (typeof statuses === 'string') {
+    return (
+      <Button raised onClick={() => onClick(statuses)}>
+        Confirm {statuses}
+      </Button>
+    );
+  }
+
+  return (
+    <div className="detailSectionStatusButtons">
+      {statuses.map(status => (
+        <Button key={status} raised onClick={() => onClick(status)}>
+          Confirm {status}
+        </Button>
+      ))}
+    </div>
+  );
+};
+
 class DetailsPage extends Component {
   state = {
     showLoader: false,
@@ -67,12 +87,12 @@ class DetailsPage extends Component {
     this.notifyError(`Document named ${documentName} already exists`);
   };
 
-  appendToItem = async () => {
+  appendToItem = async status => {
     const { user, project } = this.props;
     const { metadata, item } = this.state;
     const meta = metadata.length;
     this.setState({ showLoader: true });
-    const response = await appendItemChannel(metadata, this.props, this.documentExists);
+    const response = await appendItemChannel(metadata, this.props, this.documentExists, status);
     if (response) {
       this.notifySuccess(`${upperFirst(project.trackingUnit)} ${meta ? '' : 'status '}updated`);
       this.setState({
@@ -81,7 +101,7 @@ class DetailsPage extends Component {
         fileUploadEnabled: true,
       });
       this.retrieveItem(response);
-      reassignOwnership(project, user, item);
+      reassignOwnership(project, user, item, status);
     } else {
       this.setState({ showLoader: false });
       this.notifyError('Something went wrong');
@@ -148,10 +168,7 @@ class DetailsPage extends Component {
 
     if (!item) return <Loader showLoader={showLoader} />;
 
-    const nextStatus =
-      user.canAppendToStream && item
-        ? user.nextEvents[item.status.toLowerCase().replace(/[- ]/g, '')]
-        : '';
+    const nextEvents = user.nextEvents[item.status.toLowerCase().replace(/[- ]/g, '')];
 
     return (
       <div>
@@ -172,10 +189,8 @@ class DetailsPage extends Component {
                   ? item[detailsPage.title]
                   : detailsPage.title.map(field => item[field]).join(' → ')}
               </h1>
-              {user.canAppendToStream && !statusUpdated && nextStatus ? (
-                <Button raised onClick={this.appendToItem}>
-                  Confirm {nextStatus}
-                </Button>
+              {user.canAppendToStream && !statusUpdated && nextEvents ? (
+                <StatusButtons statuses={nextEvents} onClick={this.appendToItem} />
               ) : null}
             </div>
             <Tabs

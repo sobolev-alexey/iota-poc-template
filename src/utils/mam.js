@@ -79,7 +79,7 @@ export const fetchItem = async (root, secretKey, storeItemCallback, setStateCalb
 const getUniqueStatuses = itemEvents =>
   uniqBy(itemEvents.map(event => pick(event, ['status', 'timestamp'])), 'status');
 
-export const createItemChannel = (project, itemId, request) => {
+export const createItemChannel = (project, itemId, request, userId) => {
   const promise = new Promise(async (resolve, reject) => {
     try {
       const secretKey = generateSeed(20);
@@ -101,7 +101,7 @@ export const createItemChannel = (project, itemId, request) => {
 
       if (channel && !isEmpty(channel)) {
         // Create a new item entry using that item ID
-        await createItem(eventBody, channel, secretKey);
+        await createItem(eventBody, channel, secretKey, userId);
       }
 
       return resolve(eventBody);
@@ -114,7 +114,7 @@ export const createItemChannel = (project, itemId, request) => {
   return promise;
 };
 
-export const appendItemChannel = async (metadata, props, documentExists) => {
+export const appendItemChannel = async (metadata, props, documentExists, status) => {
   const meta = metadata.length;
   const {
     project,
@@ -126,15 +126,13 @@ export const appendItemChannel = async (metadata, props, documentExists) => {
     },
   } = props;
   const { mam } = find(items, { itemId });
-  const { status, documents } = last(item);
+  const { documents } = last(item);
 
   const promise = new Promise(async (resolve, reject) => {
     try {
       if (item) {
         const timestamp = Date.now();
-        const newStatus = meta
-          ? status
-          : user.nextEvents[status.toLowerCase().replace(/[- ]/g, '')];
+        const newStatus = meta ? last(item).status : status;
 
         metadata.forEach(({ name }) => {
           documents.forEach(existingDocument => {

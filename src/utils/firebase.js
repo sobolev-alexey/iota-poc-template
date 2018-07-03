@@ -114,18 +114,19 @@ const removeItemFromCurrentUser = (user, itemId) => {
   });
 };
 
-export const reassignOwnership = (project, user, item, removeFromCurrentOwner = true) => {
+export const reassignOwnership = (project, user, item, status, removeFromCurrentOwner = true) => {
   if (removeFromCurrentOwner) {
     // for create item set flag to "false"
     removeItemFromCurrentUser(user, item.itemId);
   }
-  const newUsers = getNextUsers(project, user, item);
+  const newUsers = getNextUsers(project, user, item, status);
   newUsers.map(newUser => appendItemToNewUser(newUser, item.itemId));
 };
 
-export const createItem = (eventBody, channel, secretKey) => {
+export const createItem = (eventBody, channel, secretKey, userId) => {
   // Create item reference
   const itemsRef = getItemReference(eventBody.itemId);
+  appendItemToNewUser(userId, eventBody.itemId);
 
   itemsRef.set({
     ...eventBody,

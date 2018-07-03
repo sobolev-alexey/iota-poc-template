@@ -81,7 +81,7 @@ class CreateItemPage extends Component {
       const firebaseSnapshot = await getFirebaseSnapshot(itemId, this.onError);
       if (firebaseSnapshot === null) {
         this.setState({ showLoader: true });
-        const eventBody = await createItemChannel(project, itemId, request);
+        const eventBody = await createItemChannel(project, itemId, request, id);
 
         await addItem(itemId);
         await storeItem([eventBody]);

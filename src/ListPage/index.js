@@ -34,11 +34,15 @@ class ListPage extends Component {
     if (error) {
       this.notifyError(error);
     }
-    if (isEmpty(this.props.items.data) && nextProps.user.previousEvent) {
+    if (
+      isEmpty(this.props.items.data) &&
+      nextProps.user.previousEvent &&
+      !this.props.user.previousEvent
+    ) {
       this.setState({ showLoader: true });
       this.props.storeItems(nextProps.user);
     }
-    if (!isEmpty(data) || !isEmpty(this.props.items.data)) {
+    if (!isEmpty(data) || !isEmpty(this.props.items.data) || this.props.user.previousEvent) {
       this.setState({ showLoader: false });
     }
   }
