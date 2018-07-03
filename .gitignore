@@ -11,7 +11,7 @@
 .env.test.local
 .env.production.local
 
-/src/config.json
+/src/config*.json
 
 /firebase_functions/appengine
 
